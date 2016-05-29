@@ -1,0 +1,35 @@
+---
+
+- name: Start composition 'Local'
+  hosts: local
+  vars:
+    composition_name: local
+  tasks:
+    # include templates defined in templates.yml
+    - include_vars: templates.yml
+  roles:
+    # create and run the container composition
+    - role: docker_container_configurator
+      name: "{{ composition_name }}"
+      DOMAINNAME: domain.tld
+      config:
+        mysql:
+          template: mysql
+          MYSQL_ROOT_PASSWORD: "{{ local.MYSQL_ROOT_PASSWORD }}"
+          CONFIG: small
+        phpmyadmin:
+          template: phpmyadmin
+          DOMAINNAME: "phpmyadmin.{{DOMAINNAME}}"
+        etherpad:
+          template: etherpad
+          DOMAINNAME: "pad.{{DOMAINNAME}}"
+          DATABASE_PW: {{ local.ETHERPAD_DB_PASSWORD }}
+          ADMIN_PW: {{ local.ETHERPAD_ADMIN_PASSWORD }}
+          LANGUAGE: "de"
+        wordpress:
+         template: wordpress
+         DOMAINNAME: "www.{{DOMAINNAME}}"
+        mediawiki:
+         template: mediawiki
+         DOMAINNAME: "wiki.{{DOMAINNAME}}"
+         TLS_ONLY: true

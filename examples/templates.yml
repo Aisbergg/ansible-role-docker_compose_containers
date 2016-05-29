@@ -1,0 +1,196 @@
+---
+
+composition_volume_dir: "{{ base_volume_dir }}/{{ composition_name }}"
+
+# run order as a priority list (linking is done properly anyway)
+run_order:
+  #- first
+  #- second
+
+templates:
+  # base template with all available options of docker_container
+  base:
+    api_version: "{{ omit }}"
+    blkio_weight: "{{ omit }}"
+    cacert_path: "{{ omit }}"
+    capabilities: "{{ omit }}"
+    cert_path: "{{ omit }}"
+    command: "{{ omit }}"
+    cpu_period: "{{ omit }}"
+    cpu_quota: "{{ omit }}"
+    cpu_shares: "{{ omit }}"
+    cpuset_cpus: "{{ omit }}"
+    cpuset_mems: "{{ omit }}"
+    detach: yes
+    devices: "{{ omit }}"
+    dns_search_domains: "{{ omit }}"
+    dns_servers: "{{ omit }}"
+    docker_host: "{{ omit }}"
+    entrypoint: "{{ omit }}"
+    env: "{{ omit }}"
+    etc_hosts: "{{ omit }}"
+    exposed_ports: "{{ omit }}"
+    force_kill: "{{ omit }}"
+    groups: "{{ omit }}"
+    hostname: "{% raw %}{{ HOSTNAME }}{% endraw %}"
+    ignore_image: "{{ omit }}"
+    image: "{{ omit }}"
+    interactive: "{{ omit }}"
+    ipc_mode: "{{ omit }}"
+    keep_volumes: yes
+    kernel_memory: "{{ omit }}"
+    key_path: "{{ omit }}"
+    kill_signal: "{{ omit }}"
+    labels: "{{ omit }}"
+    links: "{{ omit }}"
+    log_driver: json-file
+    log_options: "{{ omit }}"
+    mac_address: "{{ omit }}"
+    memory: "{% raw %}{{ MEMORY_LIMIT }}{% endraw %}"
+    memory_reservation: "{{ omit }}"
+    memory_swap: "{{ omit }}"
+    memory_swappiness: "{{ omit }}"
+    name: "{{ composition_name }}_{% raw %}{{ CONTAINER_CONFIG_NAME if CONTAINER_NAME is undefined else CONTAINER_NAME }}{% endraw %}"
+    network_mode: bridge
+    oom_killer: "{{ omit }}"
+    paused: "{{ omit }}"
+    pid_mode: "{{ omit }}"
+    privileged: false
+    published_ports: "{{ omit }}"
+    pull: false
+    read_only: "{{ omit }}"
+    recreate: false
+    registry: "{{ omit }}"
+    restart: "{{ omit }}"
+    restart_policy: always
+    restart_retries: 1
+    security_opts: "{{ omit }}"
+    shm_size: "{{ omit }}"
+    ssl_version: "{{ omit }}"
+    state: "{{ STATE | default('started') }}"
+    stop_signal: "{{ omit }}"
+    stop_timeout: "{{ omit }}"
+    timeout: "{{ omit }}"
+    tls: "{{ omit }}"
+    tls_hostname: "{{ omit }}"
+    tls_verify: "{{ omit }}"
+    trust_image_content: "{{ omit }}"
+    tty: false
+    ulimits: "{{ omit }}"
+    user: "{{ omit }}"
+    uts: "{{ omit }}"
+    volume_driver: "{{ omit }}"
+    volumes:
+      # sync time with host system
+      - "/etc/localtime:/etc/localtime:ro"
+    volumes_from: "{{ omit }}"
+
+  aisberg/nginx:
+    based_on: base
+    image: aisberg/nginx
+    hostname: "{% raw %}{{ HOSTNAME }}.{{ DOMAINNAME | required('You need to specify a DOMAINNAME') }}{% endraw %}"
+    env:
+      # domainname is not added to HOSTNAME anymore, therefore DOMAINNAME need
+      # to be set manually
+      DOMAINNAME: "{% raw %}{{ DOMAINNAME }}{% endraw %}"
+      ALIAS_DOMAINNAMES: "{% raw %}{% for alias_domainname in ALIAS_DOMAINNAMES %}{{ alias_domainname }}{% if not loop.last %}, {% endif %}{% endfor %}{% endraw %}"
+      WORKER_PROCESSES: "{% raw %}{{ WORKER_PROCESSES }}{% endraw %}"
+      WORKER_CONNECTIONS: "{% raw %}{{ WORKER_CONNECTIONS }}{% endraw %}"
+      WORKER_OPENED_FILES: "{% raw %}{{ WORKER_OPENED_FILES }}{% endraw %}"
+      POST_MAX_SIZE: "{% raw %}{{ POST_MAX_SIZE }}{% endraw %}"
+      KEEPALIVE_TIMEOUT: "{% raw %}{{ KEEPALIVE_TIMEOUT }}{% endraw %}"
+      CONN_LIMIT_PER_IP: "{% raw %}{{ CONN_LIMIT_PER_IP }}{% endraw %}"
+      REQ_LIMIT_PER_IP_RATE: "{% raw %}{{ REQ_LIMIT_PER_IP_RATE }}{% endraw %}"
+      REQ_LIMIT_PER_IP_BURST: "{% raw %}{{ REQ_LIMIT_PER_IP_BURST }}{% endraw %}"
+      MULTI_ACCEPT: "{% raw %}{{ MULTI_ACCEPT }}{% endraw %}"
+      BEHIND_PROXY: "{% raw %}{{ BEHIND_PROXY }}{% endraw %}"
+      TLS_TERMINATED: "{% raw %}{{ TLS_TERMINATED }}{% endraw %}"
+      TLS_KEY: "{% raw %}{{ TLS_KEY }}{% endraw %}"
+      TLS_CERT: "{% raw %}{{ TLS_CERT }}{% endraw %}"
+      TLS_ONLY: "{% raw %}{{ TLS_ONLY }}{% endraw %}"
+      DH_SIZE: "{% raw %}{{ DH_SIZE }}{% endraw %}"
+    volumes:
+      # dir for serving the challenge response of Let's Encrypt
+      - "{{ composition_volume_dir }}/var/www/letsencrypt-challenge-response:/var/www/letsencrypt-challenge-response:ro"
+
+  aisberg/nginx-php5:
+    based_on: aisberg/nginx
+    image: aisberg/nginx-php5
+    env:
+      CONN_LIMIT_PER_IP: "{% raw %}{{ CONN_LIMIT_PER_IP }}{% endraw %}"
+      FASTCGI_READ_TIMEOUT: "{% raw %}{{ FASTCGI_READ_TIMEOUT }}{% endraw %}"
+      PHP_FPM_MAX_CHILDREN: "{% raw %}{{ PHP_FPM_MAX_CHILDREN }}{% endraw %}"
+      PHP_FPM_MIN_SPARE_SERVERS: "{% raw %}{{ PHP_FPM_MIN_SPARE_SERVERS }}{% endraw %}"
+      PHP_FPM_MAX_SPARE_SERVERS: "{% raw %}{{ PHP_FPM_MAX_SPARE_SERVERS }}{% endraw %}"
+
+  aisberg/nginx-php7:
+    based_on: aisberg/nginx
+    image: aisberg/nginx-php7
+    env:
+      CONN_LIMIT_PER_IP: "{% raw %}{{ CONN_LIMIT_PER_IP }}{% endraw %}"
+      FASTCGI_READ_TIMEOUT: "{% raw %}{{ FASTCGI_READ_TIMEOUT }}{% endraw %}"
+      PHP_FPM_MAX_CHILDREN: "{% raw %}{{ PHP_FPM_MAX_CHILDREN }}{% endraw %}"
+      PHP_FPM_MIN_SPARE_SERVERS: "{% raw %}{{ PHP_FPM_MIN_SPARE_SERVERS }}{% endraw %}"
+      PHP_FPM_MAX_SPARE_SERVERS: "{% raw %}{{ PHP_FPM_MAX_SPARE_SERVERS }}{% endraw %}"
+
+  mysql:
+    based_on: base
+    image: aisberg/mysql
+    command: "MYSQL_ROOT_PASSWORD={% raw %}{{ MYSQL_ROOT_PASSWORD }}{% endraw %}"
+    env:
+      CONFIG: "{% raw %}{{ CONFIG }}{% endraw %}"
+    memory: "{% raw %}{{ MEMORY_LIMIT | default('1200MB') }}{% endraw %}"
+    name: "{{ composition_name }}_mysql"
+    volumes:
+      - "{{ composition_volume_dir }}/var/lib/mysql:/var/lib/mysql"
+
+  phpmyadmin:
+    based_on: aisberg/nginx-php7
+    image: aisberg/phpmyadmin
+    env:
+      DEFAULT_LANGUAGE: "{% raw %}{{ DEFAULT_LANGUAGE | default('de') }}{% endraw %}"
+    links:
+      - "{{ composition_name }}_mysql:mysql"
+    volumes:
+      - "{{ composition_volume_dir }}/var/lib/mysql_dumps:/var/lib/mysql_dumps"
+
+  wordpress:
+    based_on: aisberg/nginx-php7
+    image: "aisberg/wordpress{% raw %}{% if TAG is defined %}:{{ TAG }}{% endif %}{% endraw %}"
+    env:
+      TLS_ONLY: "{% raw %}{{ TLS_ONLY | default(true) }}{% endraw %}"
+    links:
+      - "{{ composition_name }}_mysql:mysql"
+    memory: "{% raw %}{{ MEMORY_LIMIT | default('400MB') }}{% endraw %}"
+    volumes:
+      - "{{ composition_volume_dir }}/var/www/{% raw %}{{ CONTAINER_CONFIG_NAME }}{% endraw %}:/var/www/wordpress"
+      - "{{ composition_volume_dir }}/etc/nginx/conf.d/{% raw %}{{ CONTAINER_CONFIG_NAME }}{% endraw %}:/etc/nginx/conf.d/wordpress"
+
+  mediawiki:
+    based_on: aisberg/nginx-php7
+    image: aisberg/mediawiki
+    env:
+      AUTO_UPDATE: "{% raw %}{{ AUTO_UPDATE | default(true) }}{% endraw %}"
+      TLS_ONLY: "{% raw %}{{ TLS_ONLY | default(true) }}{% endraw %}"
+    links:
+      - "{{ composition_name }}_mysql:mysql"
+    memory: "{% raw %}{{ MEMORY_LIMIT | default('200MB') }}{% endraw %}"
+    volumes:
+      - "{{ composition_volume_dir }}/var/www/{% raw %}{{ CONTAINER_CONFIG_NAME }}{% endraw %}:/var/www/mediawiki"
+      - "{{ composition_volume_dir }}/etc/nginx/conf.d/{% raw %}{{ CONTAINER_CONFIG_NAME }}{% endraw %}:/etc/nginx/conf.d/mediawiki"
+
+  etherpad:
+    based_on: aisberg/nginx
+    image: aisberg/etherpad
+    command: "DATABASE_PW={% raw %}{{ DATABASE_PW }}{% endraw %} ADMIN_PW={% raw %}{{ ADMIN_PW }}{% endraw %}"
+    env:
+      AUTO_UPDATE: "{% raw %}{{ AUTO_UPDATE | default(true) }}{% endraw %}"
+      SITE_TITLE: "{% raw %}{{ SITE_TITLE | default('My Pad') }}{% endraw %}"
+      LANGUAGE: "{% raw %}{{ LANGUAGE | default('de') }}{% endraw %}"
+    links:
+      - "{{ composition_name }}_mysql:mysql"
+    memory: "{% raw %}{{ MEMORY_LIMIT | default('400MB') }}{% endraw %}"
+    name: "{{ composition_name }}_etherpad"
+    volumes:
+      - "{{ composition_volume_dir }}/opt/etherpad:/opt/etherpad"
+      - "{{ composition_volume_dir }}/etc/nginx/conf.d/etherpad:/etc/nginx/conf.d/etherpad"
