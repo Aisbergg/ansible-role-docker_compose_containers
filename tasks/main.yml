@@ -6,7 +6,7 @@
     config: "{{ config }}"
     run_order: "{{ run_order | default(omit) }}"
 
-- name: "Manage containers"
+- name: Manage containers
   docker_container:
     api_version: "{{ item.api_version | default(omit) }}"
     blkio_weight: "{{ item.blkio_weight | default(omit) }}"

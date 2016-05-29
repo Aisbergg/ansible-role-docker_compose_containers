@@ -1,6 +1,6 @@
-# Ansible - Docker Container Configurator
+# Ansible - Docker Compose Containers
 
-Ansible role for creating docker container compositions. It let's you easily manage extensive container compositions with a lot of containers and detailed startup parameters. Based on reusable templates the container configuration is created and then used with the *[docker_container](http://docs.ansible.com/ansible/docker_container_module.html)* module to manage the container.
+Ansible role for creating docker container compositions. It let's you easily manage extensive container compositions with a lot of containers and detailed startup parameters. Based on reusable templates a configuration of a container composition is created and then passed to the *[docker_container](http://docs.ansible.com/ansible/docker_container_module.html)* module to manage the docker container.
 
 ## Requirements
 
@@ -36,16 +36,15 @@ Example playbook:
 
 There are three variables to be passed into the role:
 
-Variable  | Purpose  | Type |  Mandatory
---------- | -------- | ---- | ----------
-templates | Defines all the templates that can be used to create a container configurations. | Dict | yes
-config    | The custom configuration using the predefined templates. | Dict | yes
+Variable  | Purpose                                                                                                                                  | Type | Mandatory
+----------|------------------------------------------------------------------------------------------------------------------------------------------|------|----------
+templates | Defines all the templates that can be used to create a container configurations.                                                         | Dict | yes
+config    | The custom configuration using the predefined templates.                                                                                 | Dict | yes
 run_order | Specifies a custom run order in which the container shall be managed. The proper container link order of the any container is preserved. | List | no
 
 ### Templates
 
-
-Before a container configuration can be created a template must be defined. It consists mostly of the official *docker_container* options. A comprehensive list of all those options can be found [here](http://docs.ansible.com/ansible/docker_container_module.html).
+Before a composition can be created a template must be defined. It consists mostly of the official *docker_container* options. A comprehensive list of all those options can be found [here](http://docs.ansible.com/ansible/docker_container_module.html).
 
 #### Basic Structure
 
@@ -90,7 +89,7 @@ templates:
       SOMEVAR: "{% raw %}{{ SOMEVAR }}{% endraw %}"
 ```
 
-When the template `phpmyadmin` is used a configuration as follows could be created:
+When the template `phpmyadmin` is used a configuration as follows could be generated:
 
 ```yaml
 phpmyadmin:
@@ -104,9 +103,9 @@ phpmyadmin:
     SOMEVAR: "is it so hard to live in peace?"
 ```
 
-### Configuration
+### Composition
 
-Once the template are defined, these can be used in a configuration. Look at the configuration as the instances of a class. These instances can have they own set of variables. These variables can be used for rendering the templates and even replace option by explicitly defining those in the configuration:
+Once the templates are defined, these can be used in a container configuration. Look at the configuration as the instances of a class. These instances can have their own set of variables. These variables can be used for rendering the templates and even replace option by explicitly defining those in the configuration:
 
 Look at following example:
 
@@ -137,7 +136,7 @@ run_order:
   - webserver
 ```
 
-If this run order is in place then all configuration which are using the `phpmyadmin` template will be manged before those using `webserver`.
+If this run order is in place then all configurations that make use of the `phpmyadmin` template will be manged before those using `webserver`.
 
 ### Examples
 
