@@ -90,6 +90,19 @@ def _merge_dicts(first, second):
 
     return merged
 
+def _remove_omit_placeholder(string):
+    """ Removes the omit placeholder of ansible with an empty string.
+
+    Args:
+        string (str): Input string possibly containing omit placeholders.
+
+    Returns:
+        str.  Input string but with replaced placeholders.
+
+    """
+    regex_pattern = r'__omit_place_holder__[0-9a-f]{40}'
+    return re.sub(regex_pattern, '', string)
+
 class ContainerConfiguration:
     """ Represents a rendered container configuration.
 
@@ -170,7 +183,7 @@ class ContainerConfiguration:
                     new_value.append(result)
             return new_value if len(new_value) > 0 else None
         elif isinstance(value, str):
-            value = self._remove_omit_placeholder(value)
+            value = _remove_omit_placeholder(value)
             result = jinja_env.from_string(value) \
                 .render(context).encode('utf-8')
             return result if len(result) > 0 else None
@@ -308,19 +321,6 @@ class ContainerConfiguration:
 
         return None
 
-    def _remove_omit_placeholder(self, string):
-        """ Removes the omit placeholder of ansible with an empty string.
-
-        Args:
-            string (str): Input string possibly containing omit placeholders.
-
-        Returns:
-            str.  Input string but with replaced placeholders.
-
-        """
-        regex_pattern = r'__omit_place_holder__[0-9a-f]{40}'
-        return re.sub(regex_pattern, '', string)
-
 
 class ContainerTemplate:
     """ Represents a generic container template.
@@ -355,7 +355,6 @@ class ContainerTemplate:
         """
         return self._template
 
-
     def _get_parent_template(self, parent_name, partial_templates, recursion_level):
         """ Gets the template of the parent partial template and merges it.
 
@@ -384,11 +383,15 @@ class ContainerTemplate:
             if partial_template['based_on'] is None:
                 pass
             elif isinstance(partial_template['based_on'], list):
-                parent_list = partial_template['based_on']
-                for parent in parent_list:
-                    cnt_template = _merge_dicts(self._get_parent_template(parent, partial_templates, recursion_level), cnt_template)
+                for parent in partial_template['based_on']:
+                    if isinstance(parent, str):
+                        parent = _remove_omit_placeholder(parent)
+                        if parent != "":
+                            cnt_template = _merge_dicts(self._get_parent_template(parent, partial_templates, recursion_level), cnt_template)
             elif isinstance(partial_template['based_on'], str):
-                cnt_template = _merge_dicts(self._get_parent_template(partial_template['based_on'], partial_templates, recursion_level), cnt_template)
+                parent = _remove_omit_placeholder(partial_template['based_on'])
+                if parent != "":
+                    cnt_template = _merge_dicts(self._get_parent_template(parent, partial_templates, recursion_level), cnt_template)
 
         return cnt_template
 
