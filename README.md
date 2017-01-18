@@ -4,7 +4,7 @@ Ansible role for creating docker container compositions. It let's you easily man
 
 ## Requirements
 
-This roles requires Ansible 2.1.0 with the new introduced *docker_container* module.
+This roles requires Ansible 2.2
 
 ## Usage
 
