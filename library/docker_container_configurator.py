@@ -225,6 +225,7 @@ class ContainerConfiguration:
         """
         parameter = [
             'api_version',
+            'auto_remove',
             'blkio_weight',
             'cacert_path',
             'capabilities',
@@ -288,10 +289,12 @@ class ContainerConfiguration:
             'state',
             'stop_signal',
             'stop_timeout',
+            'sysctls',
             'timeout',
             'tls',
             'tls_hostname',
             'tls_verify',
+            'tmpfs',
             'trust_image_content',
             'tty',
             'ulimits',
@@ -299,7 +302,8 @@ class ContainerConfiguration:
             'uts',
             'volume_driver',
             'volumes',
-            'volumes_from'
+            'volumes_from',
+            'working_dir'
         ]
         result = dict()
         for param in parameter:

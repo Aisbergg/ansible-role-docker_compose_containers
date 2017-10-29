@@ -4,7 +4,7 @@ galaxy_info:
   author: Andre Lehmann
   description: Creating docker container compositions
   license: MIT
-  min_ansible_version: 2.2
+  min_ansible_version: 2.4
   platforms:
     - name: GenericLinux
       versions:

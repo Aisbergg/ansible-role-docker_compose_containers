@@ -1,10 +1,10 @@
 # Ansible - Docker Compose Containers
 
-Ansible role for creating docker container compositions. It let's you easily manage extensive container compositions with a lot of containers and detailed startup parameters. Based on reusable templates a configuration of a container composition is created and then passed to the *[docker_container](http://docs.ansible.com/ansible/docker_container_module.html)* module to manage the docker container.
+Ansible role for creating docker container compositions (don't confuse with docker compose, because this isn't related). It let's you easily manage extensive container compositions with a lot of containers and detailed startup parameters. Based on reusable templates a configuration of a container composition is created and then passed to the *[docker_container](http://docs.ansible.com/ansible/docker_container_module.html)* module to manage the docker container.
 
 ## Requirements
 
-This roles requires Ansible 2.2
+This roles requires Ansible 2.4
 
 ## Usage
 

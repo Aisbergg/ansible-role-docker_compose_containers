@@ -9,6 +9,7 @@
 - name: Manage containers
   docker_container:
     api_version: "{{ item.api_version | default(omit) }}"
+    auto_remove: "{{ item.auto_remove | default(omit) }}"
     blkio_weight: "{{ item.blkio_weight | default(omit) }}"
     cacert_path: "{{ item.cacert_path | default(omit) }}"
     capabilities: "{{ item.capabilities | default(omit) }}"
@@ -72,10 +73,12 @@
     state: "{{ item.state | default(omit) }}"
     stop_signal: "{{ item.stop_signal | default(omit) }}"
     stop_timeout: "{{ item.stop_timeout | default(omit) }}"
+    sysctls: "{{ item.sysctls | default(omit) }}"
     timeout: "{{ item.timeout | default(omit) }}"
     tls: "{{ item.tls | default(omit) }}"
     tls_hostname: "{{ item.tls_hostname | default(omit) }}"
     tls_verify: "{{ item.tls_verify | default(omit) }}"
+    tmpfs: "{{ item.tmpfs | default(omit) }}"
     trust_image_content: "{{ item.trust_image_content | default(omit) }}"
     tty: "{{ item.tty | default(omit) }}"
     ulimits: "{{ item.ulimits | default(omit) }}"
@@ -84,4 +87,5 @@
     volume_driver: "{{ item.volume_driver | default(omit) }}"
     volumes: "{{ item.volumes | default(omit) }}"
     volumes_from: "{{ item.volumes_from | default(omit) }}"
+    working_dir: "{{ item.working_dir | default(omit) }}"
   with_list: "{{ docker_container_configurations }}"
